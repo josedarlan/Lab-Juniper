@@ -1,0 +1,39 @@
+et system host-name vMX-3
+set system root-authentication encrypted-password "$1$iiqdh9ru$CBQygri2MkpfgtgdGo8GO1"
+set system login user lab uid 2000
+set system login user lab class super-user
+set system login user lab authentication encrypted-password "$1$oW1NeMUu$N7IVMfy8GfJ02jzQzJ39h/"
+set system services ssh
+set system services telnet connection-limit 5
+set system syslog user * any emergency
+set system syslog file messages any notice
+set system syslog file messages authorization info
+set system syslog file interactive-commands interactive-commands any
+set interfaces ge-0/0/1 description vMX1
+set interfaces ge-0/0/1 unit 0 family inet address 10.0.0.2/30
+set interfaces ge-0/0/1 unit 0 family inet6 address 2001:db8::6/126
+set interfaces ge-0/0/2 description vMX2
+set interfaces ge-0/0/2 unit 0 family inet address 10.0.0.10/30
+set interfaces ge-0/0/2 unit 0 family inet6 address 2001:db8::a/126
+set interfaces ge-0/0/3 description DEVICES-LAN
+set interfaces ge-0/0/3 unit 0 family inet address 172.16.3.1/30
+set interfaces ge-0/0/3 unit 0 family inet6 address 2001:db8:da00::1/64
+set interfaces lo0 unit 0 family inet address 10.3.3.3/32
+set interfaces lo0 unit 0 family inet6 address 2001:db8:cafe::3/128
+set routing-options router-id 10.3.3.3
+set protocols ospf area 0.0.0.0 interface ge-0/0/1.0 interface-type p2p
+set protocols ospf area 0.0.0.0 interface ge-0/0/1.0 hello-interval 3
+set protocols ospf area 0.0.0.0 interface ge-0/0/1.0 dead-interval 9
+set protocols ospf area 0.0.0.0 interface ge-0/0/3.0 passive
+set protocols ospf area 0.0.0.0 interface lo0.0 passive
+set protocols ospf area 0.0.0.0 interface ge-0/0/2.0 interface-type p2p
+set protocols ospf area 0.0.0.0 interface ge-0/0/2.0 hello-interval 3
+set protocols ospf area 0.0.0.0 interface ge-0/0/2.0 dead-interval 9
+set protocols ospf3 area 0.0.0.0 interface lo0.0 passive
+set protocols ospf3 area 0.0.0.0 interface ge-0/0/1.0 interface-type p2p
+set protocols ospf3 area 0.0.0.0 interface ge-0/0/1.0 hello-interval 3
+set protocols ospf3 area 0.0.0.0 interface ge-0/0/1.0 dead-interval 9
+set protocols ospf3 area 0.0.0.0 interface ge-0/0/2.0 interface-type p2p
+set protocols ospf3 area 0.0.0.0 interface ge-0/0/2.0 hello-interval 3
+set protocols ospf3 area 0.0.0.0 interface ge-0/0/2.0 dead-interval 9
+

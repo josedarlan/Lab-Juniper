@@ -1,0 +1,76 @@
+set system host-name vMX-2
+set system root-authentication encrypted-password "$1$iiqdh9ru$CBQygri2MkpfgtgdGo8GO1"
+set system login user lab uid 2000
+set system login user lab class super-user
+set system login user lab authentication encrypted-password "$1$oW1NeMUu$N7IVMfy8GfJ02jzQzJ39h/"
+set system services ssh
+set system services telnet connection-limit 5
+set system syslog user * any emergency
+set system syslog file messages any notice
+set system syslog file messages authorization info
+set system syslog file interactive-commands interactive-commands any
+set interfaces ge-0/0/0 description vMX1
+set interfaces ge-0/0/0 unit 0 family inet address 10.0.0.6/30
+set interfaces ge-0/0/0 unit 0 family inet6 address 2001:db8::2/126
+set interfaces ge-0/0/1 description TRANSITO-ASN-65050
+set interfaces ge-0/0/1 unit 0 family inet address 10.0.0.13/30
+set interfaces ge-0/0/1 unit 0 family inet6 address 2001:db8::12/126
+set interfaces ge-0/0/2 description vMX3
+set interfaces ge-0/0/2 unit 0 family inet address 10.0.0.9/30
+set interfaces ge-0/0/2 unit 0 family inet6 address 2001:db8::9/126
+set interfaces ge-0/0/3 unit 0 family inet address 172.16.2.1/30
+set interfaces lo0 unit 0 family inet address 10.2.2.2/32
+set interfaces lo0 unit 0 family inet address 65.0.0.1/32
+set interfaces lo0 unit 0 family inet6 address 2001:db8:cafe::2/128
+set routing-options rib inet6.0 static route 2001:db8::/32 discard
+set routing-options static route 0.0.0.0/0 discard
+set routing-options static route 0.0.0.0/0 no-install
+set routing-options static route 65.0.0.0/22 discard
+set routing-options router-id 10.2.2.2
+set routing-options autonomous-system 65000
+set protocols bgp traceoptions file LOG-BGP
+set protocols bgp traceoptions file size 5m
+set protocols bgp traceoptions file files 2
+set protocols bgp traceoptions file world-readable
+set protocols bgp traceoptions flag all
+set protocols bgp group EBGP-ASN-65050 type external
+set protocols bgp group EBGP-ASN-65050 import EBGP-TRANSITO-ASN-65050-IMPORT
+set protocols bgp group EBGP-ASN-65050 export EBGP-TRANSITO-ASN-65050-EXPORT
+set protocols bgp group EBGP-ASN-65050 peer-as 65050
+set protocols bgp group EBGP-ASN-65050 neighbor 10.0.0.14
+set protocols bgp group EBGP-IPV6-ASN-65050 type external
+set protocols bgp group EBGP-IPV6-ASN-65050 export EBGP-IPV6-TRANSITO-ASN-65050-EXPORT
+set protocols bgp group EBGP-IPV6-ASN-65050 peer-as 65050
+set protocols bgp group EBGP-IPV6-ASN-65050 neighbor 2001:db8::13
+set protocols ospf traceoptions file LOG-OSPF
+set protocols ospf traceoptions file size 5m
+set protocols ospf traceoptions file files 2
+set protocols ospf traceoptions file world-readable
+set protocols ospf traceoptions flag timer
+set protocols ospf traceoptions flag all
+set protocols ospf export FILTER-OSPF-OUT
+set protocols ospf area 0.0.0.0 interface ge-0/0/0.0 interface-type p2p
+set protocols ospf area 0.0.0.0 interface ge-0/0/0.0 hello-interval 3
+set protocols ospf area 0.0.0.0 interface ge-0/0/0.0 dead-interval 9
+set protocols ospf area 0.0.0.0 interface ge-0/0/2.0 interface-type p2p
+set protocols ospf area 0.0.0.0 interface ge-0/0/2.0 hello-interval 3
+set protocols ospf area 0.0.0.0 interface ge-0/0/2.0 dead-interval 9
+set protocols ospf area 0.0.0.0 interface lo0.0 passive
+set protocols ospf3 area 0.0.0.0 interface ge-0/0/0.0 interface-type p2p
+set protocols ospf3 area 0.0.0.0 interface ge-0/0/0.0 hello-interval 3
+set protocols ospf3 area 0.0.0.0 interface ge-0/0/0.0 dead-interval 9
+set protocols ospf3 area 0.0.0.0 interface ge-0/0/2.0 interface-type p2p
+set protocols ospf3 area 0.0.0.0 interface ge-0/0/2.0 hello-interval 3
+set protocols ospf3 area 0.0.0.0 interface ge-0/0/2.0 dead-interval 9
+set protocols ospf3 area 0.0.0.0 interface lo0.0 passive
+set policy-options policy-statement EBGP-IPV6-TRANSITO-ASN-65050-EXPORT term ANUNCIO-IPV6 from route-filter 2001:db8::/32 exact
+set policy-options policy-statement EBGP-IPV6-TRANSITO-ASN-65050-EXPORT term ANUNCIO-IPV6 then accept
+set policy-options policy-statement EBGP-TRANSITO-ASN-65050-EXPORT term ANUNCIO from route-filter 65.0.0.0/22 exact
+set policy-options policy-statement EBGP-TRANSITO-ASN-65050-EXPORT term ANUNCIO then accept
+set policy-options policy-statement EBGP-TRANSITO-ASN-65050-EXPORT then reject
+set policy-options policy-statement EBGP-TRANSITO-ASN-65050-IMPORT then accept
+set policy-options policy-statement FILTER-OSPF-OUT from protocol static
+set policy-options policy-statement FILTER-OSPF-OUT from protocol direct
+set policy-options policy-statement FILTER-OSPF-OUT from route-filter 0.0.0.0/0 exact
+set policy-options policy-statement FILTER-OSPF-OUT then accept
+

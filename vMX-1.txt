@@ -1,0 +1,59 @@
+set system host-name vMX-1
+set system root-authentication encrypted-password "$1$iiqdh9ru$CBQygri2MkpfgtgdGo8GO1"
+set system login user lab uid 2000
+set system login user lab class super-user
+set system login user lab authentication encrypted-password "$1$oW1NeMUu$N7IVMfy8GfJ02jzQzJ39h/"
+set system services ssh
+set system services telnet connection-limit 5
+set system syslog user * any emergency
+set system syslog file messages any notice
+set system syslog file messages authorization info
+set system syslog file interactive-commands interactive-commands any
+set interfaces ge-0/0/0 description vMX2
+set interfaces ge-0/0/0 unit 0 family inet address 10.0.0.5/30
+set interfaces ge-0/0/0 unit 0 family inet6 address 2001:db8::1/126
+set interfaces ge-0/0/1 description vMX3
+set interfaces ge-0/0/1 unit 0 family inet address 10.0.0.1/30
+set interfaces ge-0/0/1 unit 0 family inet6 address 2001:db8::5/126
+set interfaces ge-0/0/3 description DEVICES-LAN
+set interfaces ge-0/0/3 unit 0 family inet rpf-check
+set interfaces ge-0/0/3 unit 0 family inet address 65.0.1.1/24
+set interfaces ge-0/0/3 unit 0 family inet address 172.16.0.1/24
+set interfaces lo0 unit 0 family inet filter input FILTER-RE
+set interfaces lo0 unit 0 family inet address 10.1.1.1/32
+set interfaces lo0 unit 0 family inet6 address 2001:db8:cafe::1/128
+set routing-options router-id 10.1.1.1
+set protocols ospf area 0.0.0.0 interface ge-0/0/1.0 interface-type p2p
+set protocols ospf area 0.0.0.0 interface ge-0/0/1.0 hello-interval 3
+set protocols ospf area 0.0.0.0 interface ge-0/0/1.0 dead-interval 9
+set protocols ospf area 0.0.0.0 interface lo0.0 passive
+set protocols ospf area 0.0.0.0 interface ge-0/0/0.0 interface-type p2p
+set protocols ospf area 0.0.0.0 interface ge-0/0/0.0 hello-interval 3
+set protocols ospf area 0.0.0.0 interface ge-0/0/0.0 dead-interval 9
+set protocols ospf area 0.0.0.0 interface ge-0/0/3.0 passive
+set protocols ospf3 area 0.0.0.0 interface ge-0/0/0.0 interface-type p2p
+set protocols ospf3 area 0.0.0.0 interface ge-0/0/0.0 hello-interval 3
+set protocols ospf3 area 0.0.0.0 interface ge-0/0/0.0 dead-interval 9
+set protocols ospf3 area 0.0.0.0 interface ge-0/0/1.0 interface-type p2p
+set protocols ospf3 area 0.0.0.0 interface ge-0/0/1.0 hello-interval 3
+set protocols ospf3 area 0.0.0.0 interface ge-0/0/1.0 dead-interval 9
+set protocols ospf3 area 0.0.0.0 interface lo0.0 passive
+set policy-options prefix-list prefixos-privados 10.0.0.0/8
+set policy-options prefix-list prefixos-privados 172.16.0.0/16
+set policy-options prefix-list REDES-INTERNAS 172.16.0.0/16
+set firewall policer RATE-LIMIT-ICMP if-exceeding bandwidth-limit 10k
+set firewall policer RATE-LIMIT-ICMP if-exceeding burst-size-limit 5k
+set firewall policer RATE-LIMIT-ICMP then discard
+set firewall filter FILTER-RE term ACCEPT-SSH from source-prefix-list prefixos-privados
+set firewall filter FILTER-RE term ACCEPT-SSH from protocol tcp
+set firewall filter FILTER-RE term ACCEPT-SSH from port 22
+set firewall filter FILTER-RE term ACCEPT-SSH then accept
+set firewall filter FILTER-RE term DENY-SSH from protocol tcp
+set firewall filter FILTER-RE term DENY-SSH from port 22
+set firewall filter FILTER-RE term DENY-SSH then discard
+set firewall filter FILTER-RE term ACCEPT-ICMP from prefix-list prefixos-privados
+set firewall filter FILTER-RE term ACCEPT-ICMP from protocol icmp
+set firewall filter FILTER-RE term ACCEPT-ICMP then policer RATE-LIMIT-ICMP
+set firewall filter FILTER-RE term ACCEPT-ICMP then accept
+set firewall filter FILTER-RE term ACCEPT-ALL then accept
+

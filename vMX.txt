@@ -1,0 +1,26 @@
+set system host-name vMX
+set system root-authentication encrypted-password "$1$iiqdh9ru$CBQygri2MkpfgtgdGo8GO1"
+set system login user lab uid 2000
+set system login user lab class super-user
+set system login user lab authentication encrypted-password "$1$oW1NeMUu$N7IVMfy8GfJ02jzQzJ39h/"
+set system services telnet connection-limit 5
+set system syslog user * any emergency
+set system syslog file messages any notice
+set system syslog file messages authorization info
+set system syslog file interactive-commands interactive-commands any
+set interfaces ge-0/0/1 unit 0 family inet address 10.0.0.14/30
+set interfaces ge-0/0/1 unit 0 family inet6 address 2001:db8::13/126
+set interfaces lo0 unit 0 family inet address 50.0.0.1/32
+set routing-options static route 50.0.0.0/22 discard
+set routing-options autonomous-system 65050
+set protocols bgp group EBGP-DOWNSTREAM-ASN-65000 type external
+set protocols bgp group EBGP-DOWNSTREAM-ASN-65000 export EBGP-DOWNSTREAM-ASN-65000-OUT
+set protocols bgp group EBGP-DOWNSTREAM-ASN-65000 peer-as 65000
+set protocols bgp group EBGP-DOWNSTREAM-ASN-65000 neighbor 10.0.0.13
+set protocols bgp group EBGP-IPV6-DOWNSTREAM-ASN-65000 type external
+set protocols bgp group EBGP-IPV6-DOWNSTREAM-ASN-65000 peer-as 65000
+set protocols bgp group EBGP-IPV6-DOWNSTREAM-ASN-65000 neighbor 2001:db8::12
+set policy-options policy-statement EBGP-DOWNSTREAM-ASN-65000-OUT term ANUNCIOS from route-filter 50.0.0.0/22 exact
+set policy-options policy-statement EBGP-DOWNSTREAM-ASN-65000-OUT term ANUNCIOS then accept
+
+
